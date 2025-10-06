@@ -1,19 +1,27 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image } from "react-native";
 import { useRouter } from "expo-router";
 
-export default function LoginScreen() {
+export default function SignupScreen() {
   const router = useRouter();
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleLogin = () => {
-    // Temporary demo login
-    if (email && password) {
-      router.push("/home");
-    } else {
-      alert("Please enter your email and password.");
+  const handleSignup = () => {
+    if (!name || !email || !password || !confirmPassword) {
+      alert("Please fill in all fields");
+      return;
     }
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    alert("Account created successfully!");
+    router.push("/auth/login");
   };
 
   return (
@@ -24,10 +32,18 @@ export default function LoginScreen() {
           style={styles.logo}
         />
 
-        <Text style={styles.title}>Welcome Back 👋</Text>
-        <Text style={styles.subtitle}>Login to continue your fitness journey</Text>
+        <Text style={styles.title}>Create Account 🏋️</Text>
+        <Text style={styles.subtitle}>Join now and start tracking your fitness goals</Text>
 
         <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name"
+            placeholderTextColor="#999"
+            value={name}
+            onChangeText={setName}
+          />
+
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -47,18 +63,23 @@ export default function LoginScreen() {
             onChangeText={setPassword}
           />
 
-          <TouchableOpacity onPress={() => router.push("/auth/forgot-password")}>
-            <Text style={styles.forgotText}>Forgot Password?</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#999"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+
+          <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+            <Text style={styles.signupText}>Sign Up</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginText}>Login</Text>
-          </TouchableOpacity>
-
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Don’t have an account?</Text>
-            <TouchableOpacity onPress={() => router.push("/auth/signup")}>
-              <Text style={styles.signupLink}> Sign Up</Text>
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.push("/auth/login")}>
+              <Text style={styles.loginLink}> Login</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -106,31 +127,27 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
   },
-  forgotText: {
-    color: "#f39c12",
-    textAlign: "right",
-    marginBottom: 25,
-  },
-  loginButton: {
+  signupButton: {
     backgroundColor: "#f39c12",
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: "center",
+    marginTop: 10,
   },
-  loginText: {
+  signupText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
-  signupContainer: {
+  loginContainer: {
     flexDirection: "row",
     justifyContent: "center",
     marginTop: 25,
   },
-  signupText: {
+  loginText: {
     color: "#aaa",
   },
-  signupLink: {
+  loginLink: {
     color: "#f39c12",
     fontWeight: "bold",
   },
