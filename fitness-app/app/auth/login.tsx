@@ -11,6 +11,7 @@ export default function LoginScreen() {
     // Temporary demo login
     if (email && password) {
       router.push("/home");
+      
     } else {
       alert("Please enter your email and password.");
     }

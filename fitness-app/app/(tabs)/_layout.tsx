@@ -1,15 +1,12 @@
-import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Text } from "react-native";
 
-export default function RootLayout() {
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
         headerStyle: { backgroundColor: "#0A0A0A" },
         headerTintColor: "#fff",
-        headerTitleAlign: "center",
         tabBarStyle: { backgroundColor: "#0A0A0A" },
         tabBarActiveTintColor: "#1E90FF",
         tabBarInactiveTintColor: "#888",
