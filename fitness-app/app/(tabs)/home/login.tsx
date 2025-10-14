@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } fro
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "https://your-backend-url.com/api/auth/login"; // change this
+const API_URL = "https://your-backend-url.com/api/auth/login";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
