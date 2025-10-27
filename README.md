@@ -1,7 +1,7 @@
 # Personalized-fitness-tracer
 Personalized Fitness Tracker
 
-A complete plan + starter code snippets for a React Native mobile app with a Node.js/Express + MongoDB backend (MERN-style, but mobile front-end). Features:
+A complete plan + starter code snippets for a React Native mobile app with a Node.js/Express + MongoDB backend . Features:
 
 User auth (email/password + JWT)
 
