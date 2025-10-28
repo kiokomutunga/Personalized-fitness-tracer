@@ -1,6 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  Image,
+  Alert,
+} from "react-native";
 import { useRouter } from "expo-router";
+import { API } from "../../utils/app"; 
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -9,31 +20,55 @@ export default function SignupScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!name || !email || !password || !confirmPassword) {
-      alert("Please fill in all fields");
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      Alert.alert("Error", "Passwords do not match!");
       return;
     }
 
-    alert("Account created successfully!");
-    router.push("/auth/login");
+    try {
+      setLoading(true);
+
+      const res = await API.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      Alert.alert("Success", "Account created successfully!");
+      console.log("User:", res.data.user);
+      router.push("/auth/login");
+    } catch (err: any) {
+      console.log(err.response?.data);
+      Alert.alert(
+        "Signup Failed",
+        err.response?.data?.message || "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image
-          source={{ uri: "https://cdn-icons-png.flaticon.com/512/2965/2965567.png" }}
+          source={{
+            uri: "https://cdn-icons-png.flaticon.com/512/2965/2965567.png",
+          }}
           style={styles.logo}
         />
 
         <Text style={styles.title}>Create Account 🏋️</Text>
-        <Text style={styles.subtitle}>Join now and start tracking your fitness goals</Text>
+        <Text style={styles.subtitle}>
+          Join now and start tracking your fitness goals
+        </Text>
 
         <View style={styles.form}>
           <TextInput
@@ -72,8 +107,14 @@ export default function SignupScreen() {
             onChangeText={setConfirmPassword}
           />
 
-          <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
-            <Text style={styles.signupText}>Sign Up</Text>
+          <TouchableOpacity
+            style={[styles.signupButton, loading && { opacity: 0.6 }]}
+            onPress={handleSignup}
+            disabled={loading}
+          >
+            <Text style={styles.signupText}>
+              {loading ? "Creating..." : "Sign Up"}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.loginContainer}>
@@ -87,7 +128,6 @@ export default function SignupScreen() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
