@@ -1,19 +1,40 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { useRouter } from "expo-router";
+import { loginUser } from "../../utils/app"; // 👈 import the backend function
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Temporary demo login
-    if (email && password) {
-      router.push("/home");
-      
-    } else {
-      alert("Please enter your email and password.");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Missing fields", "Please enter both email and password.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = await loginUser(email, password);
+      Alert.alert("Welcome", `Hello ${data.user?.name || "User"}!`);
+      router.push("/tabs/home"); // 👈 redirect to home after login
+    } catch (err: any) {
+      Alert.alert("Login Failed", err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,8 +73,16 @@ export default function LoginScreen() {
             <Text style={styles.forgotText}>Forgot Password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginText}>Login</Text>
+          <TouchableOpacity
+            style={[styles.loginButton, loading && { opacity: 0.7 }]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginText}>Login</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.signupContainer}>
@@ -69,10 +98,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0D0D0D",
-  },
+  container: { flex: 1, backgroundColor: "#0D0D0D" },
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
@@ -80,25 +106,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 40,
   },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 24,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    color: "#aaa",
-    fontSize: 15,
-    marginBottom: 40,
-    textAlign: "center",
-  },
-  form: {
-    width: "100%",
-  },
+  logo: { width: 100, height: 100, marginBottom: 24 },
+  title: { color: "#fff", fontSize: 28, fontWeight: "bold" },
+  subtitle: { color: "#aaa", fontSize: 15, marginBottom: 40, textAlign: "center" },
+  form: { width: "100%" },
   input: {
     backgroundColor: "#1A1A1A",
     color: "#fff",
@@ -107,32 +118,19 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
   },
-  forgotText: {
-    color: "#f39c12",
-    textAlign: "right",
-    marginBottom: 25,
-  },
+  forgotText: { color: "#f39c12", textAlign: "right", marginBottom: 25 },
   loginButton: {
     backgroundColor: "#f39c12",
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: "center",
   },
-  loginText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  loginText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
   signupContainer: {
     flexDirection: "row",
     justifyContent: "center",
     marginTop: 25,
   },
-  signupText: {
-    color: "#aaa",
-  },
-  signupLink: {
-    color: "#f39c12",
-    fontWeight: "bold",
-  },
+  signupText: { color: "#aaa" },
+  signupLink: { color: "#f39c12", fontWeight: "bold" },
 });
