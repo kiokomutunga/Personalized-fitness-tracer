@@ -1,97 +1,136 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { loginUser } from "../../../utils/app"; //import the backend function
 
-const API_URL = "https://your-backend-url.com/api/auth/login";
-
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill all fields");
+      Alert.alert("Missing fields", "Please enter both email and password.");
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
-      const { data } = await axios.post(API_URL, { email, password });
-
-      if (data.success) {
-        await AsyncStorage.setItem("token", data.token);
-        await AsyncStorage.setItem("user", JSON.stringify(data.user));
-
-        Alert.alert("Success", "Login successful!");
-        navigation.replace("Profile"); // navigate to profile screen
-      } else {
-        Alert.alert("Login Failed", data.message || "Invalid credentials");
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Failed to connect. Check your internet or credentials.");
+      const data = await loginUser(email, password);
+      Alert.alert("Welcome", `Hello ${data.user?.name || "User"}!`);
+      router.push("/(tabs)/home"); // redirect to home after login
+    } catch (err: any) {
+      Alert.alert("Login Failed", err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
-      <Text style={{ fontSize: 28, fontWeight: "bold", marginBottom: 30, textAlign: "center" }}>
-        FitTrack Login
-      </Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Image
+          source={{ uri: "https://cdn-icons-png.flaticon.com/512/2965/2965567.png" }}
+          style={styles.logo}
+        />
 
-      <TextInput
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 10,
-          padding: 10,
-          marginBottom: 15,
-        }}
-      />
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 10,
-          padding: 10,
-          marginBottom: 15,
-        }}
-      />
+        <Text style={styles.title}>Welcome Back 👋</Text>
+        <Text style={styles.subtitle}>Login to continue your fitness journey</Text>
 
-      <TouchableOpacity
-        onPress={handleLogin}
-        style={{
-          backgroundColor: "#2e86de",
-          padding: 15,
-          borderRadius: 10,
-          alignItems: "center",
-        }}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={{ color: "#fff", fontSize: 16 }}>Login</Text>
-        )}
-      </TouchableOpacity>
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#999"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
 
-      <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-        <Text style={{ textAlign: "center", marginTop: 15 }}>
-          Don't have an account? <Text style={{ color: "#2e86de" }}>Register</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#999"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <TouchableOpacity onPress={() => router.push("/auth/forgot-password")}>
+            <Text style={styles.forgotText}>Forgot Password?</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.loginButton, loading && { opacity: 0.7 }]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginText}>Login</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>Don’t have an account?</Text>
+            <TouchableOpacity onPress={() => router.push("/auth/signup")}>
+              <Text style={styles.signupLink}> Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#0D0D0D" },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  logo: { width: 100, height: 100, marginBottom: 24 },
+  title: { color: "#fff", fontSize: 28, fontWeight: "bold" },
+  subtitle: { color: "#aaa", fontSize: 15, marginBottom: 40, textAlign: "center" },
+  form: { width: "100%" },
+  input: {
+    backgroundColor: "#1A1A1A",
+    color: "#fff",
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  forgotText: { color: "#f39c12", textAlign: "right", marginBottom: 25 },
+  loginButton: {
+    backgroundColor: "#f39c12",
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  loginText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  signupContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 25,
+  },
+  signupText: { color: "#aaa" },
+  signupLink: { color: "#f39c12", fontWeight: "bold" },
+});

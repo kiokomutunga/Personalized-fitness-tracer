@@ -12,7 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { loginUser } from "../../utils/app"; // 👈 import the backend function
+import { loginUser } from "../../utils/app"; //import the backend function
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export default function LoginScreen() {
     try {
       const data = await loginUser(email, password);
       Alert.alert("Welcome", `Hello ${data.user?.name || "User"}!`);
-      router.push("/tabs/home"); // 👈 redirect to home after login
+      router.push("/(tabs)/home"); // redirect to home after login
     } catch (err: any) {
       Alert.alert("Login Failed", err.message);
     } finally {
