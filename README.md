@@ -1,7 +1,7 @@
 # Personalized-fitness-tracer
 Personalized Fitness Tracker
 
-A complete plan + starter code snippets for a React Native mobile app with a Node.js/Express + MongoDB backend . Features:
+A complete plan + starter code snippets for a React Native mobile app with a Node.js/Express + MongoDB backend. Features:
 
 User auth (email/password + JWT)
 
@@ -71,7 +71,7 @@ fitness-tracker/
 
 ### User.js
 
-```js
+``` js
 const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -87,7 +87,7 @@ module.exports = mongoose.model('User', UserSchema);
 
 ### Workout.js
 
-```js
+``` js
 const mongoose = require('mongoose');
 const WorkoutSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
